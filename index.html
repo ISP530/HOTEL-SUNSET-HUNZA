@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HOTEL SUNSET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- PASSWORD SCREEN -->
+  <section id="passwordScreen" class="center-wrap">
+    <div class="card auth-card">
+      <h1 class="brand">HOTEL SUNSET</h1>
+      <p class="tagline">Manage Smarter. Stay Better.</p>
+
+      <label class="label" for="pwInput">Enter Password</label>
+      <input id="pwInput" class="input" type="password" placeholder="Enter Password" />
+      <button id="pwBtn" class="btn btn-primary">Login</button>
+      <p id="pwError" class="error">Incorrect password. Please try again.</p>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <div id="app" class="app">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="logo">HOTEL SUNSET</div>
+      </div>
+      <div class="topbar-right">
+        <button id="themeBtn" class="icon-btn" title="Theme">☀️</button>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <button class="nav active" data-page="dashboard">Dashboard</button>
+      <button class="nav" data-page="rooms">Rooms</button>
+      <button class="nav" data-page="guests">Guests</button>
+      <button class="nav" data-page="settings">Settings</button>
+      <div class="sidebar-foot">© 2025 HOTEL SUNSET. All rights reserved.</div>
+    </aside>
+
+    <main class="main">
+      <!-- Dashboard -->
+      <section id="page-dashboard" class="page active">
+        <h2 class="title">Dashboard</h2>
+        <p class="subtitle">Live overview of HOTEL SUNSET</p>
+
+        <div class="grid4">
+          <div class="card">
+            <div class="k">Available Rooms</div>
+            <div id="dAvail" class="v green">0</div>
+          </div>
+          <div class="card">
+            <div class="k">Occupied Rooms</div>
+            <div id="dOcc" class="v red">0</div>
+          </div>
+          <div class="card">
+            <div class="k">Rooms Cleaning</div>
+            <div id="dClean" class="v amber">0</div>
+          </div>
+          <div class="card">
+            <div class="k">Under Maintenance</div>
+            <div id="dMaint" class="v blue">0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row-between">
+            <div>
+              <div class="k">Hotel Occupancy</div>
+              <div id="occText" class="small">No rooms configured yet</div>
+            </div>
+            <div id="occPct" class="big">0%</div>
+          </div>
+
+          <div class="meter">
+            <div id="occFill" class="meter-fill" style="width:0%"></div>
+          </div>
+
+          <div id="occLine" class="small">Occupied: 0 / Total: 0</div>
+        </div>
+
+        <div class="card">
+          <div class="k">Rooms Becoming Available Today</div>
+          <div class="small">Live countdown timers for today's checkouts</div>
+          <div id="availTodayList" class="list">
+            <div class="empty">No checkouts scheduled for today</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="k">Quick Notes</div>
+          <div class="small">Personal reminders for the owner</div>
+          <textarea id="quickNotes" class="textarea" placeholder="Write a quick note or reminder here..."></textarea>
+        </div>
+      </section>
+
+      <!-- Rooms -->
+      <section id="page-rooms" class="page">
+        <h2 class="title">Rooms</h2>
+        <p class="subtitle">Manage all hotel rooms and their status</p>
+
+        <div class="card">
+          <div class="row-between">
+            <div class="k">Add New Room</div>
+          </div>
+
+          <div class="grid2">
+            <div>
+              <label class="label">Room Number</label>
+              <input id="roomNumber" class="input" placeholder="101" />
+            </div>
+            <div>
+              <label class="label">Floor</label>
+              <input id="roomFloor" class="input" type="number" placeholder="1" />
+            </div>
+            <div>
+              <label class="label">Room Type</label>
+              <input id="roomType" class="input" placeholder="Deluxe" />
+            </div>
+            <div>
+              <label class="label">Rate Per Night (PKR)</label>
+              <input id="roomRate" class="input" type="number" placeholder="5000" />
+            </div>
+            <div>
+              <label class="label">Status</label>
+              <select id="roomStatus" class="input">
+                <option>Available</option>
+                <option>Occupied</option>
+                <option>Cleaning</option>
+                <option>Maintenance</option>
+                <option>Blocked</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="addRoomBtn" class="btn btn-primary">Save Room</button>
+          <div id="roomsMsg" class="small"></div>
+        </div>
+
+        <div class="card">
+          <div class="k">All Rooms</div>
+          <div id="roomsList" class="list">
+            <div class="empty">No records found</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Guests -->
+      <section id="page-guests" class="page">
+        <h2 class="title">Guests</h2>
+        <div class="tabs">
+          <button class="tab active" data-tab="current">Current Guests</button>
+          <button class="tab" data-tab="checkin">Check-in New Guest</button>
+          <button class="tab" data-tab="history">Guest History</button>
+        </div>
+
+        <!-- Current -->
+        <div id="tab-current" class="tabpane active">
+          <div class="card">
+            <div class="k">Current Guests</div>
+            <div class="small">All guests currently staying at HOTEL SUNSET</div>
+            <div id="currentGuestsList" class="list">
+              <div class="empty">No guests currently staying. Check in a new guest to get started.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Check-in -->
+        <div id="tab-checkin" class="tabpane">
+          <div class="card">
+            <div class="k">Check-in New Guest</div>
+            <div class="small">Register a new guest and assign a room</div>
+
+            <div class="grid2">
+              <div>
+                <label class="label">Guest Name</label>
+                <input id="gName" class="input" placeholder="Full Name" />
+              </div>
+              <div>
+                <label class="label">Phone Number</label>
+                <input id="gPhone" class="input" placeholder="+92..." />
+              </div>
+
+              <div>
+                <label class="label">Select Room</label>
+                <select id="gRoom" class="input"></select>
+              </div>
+              <div>
+                <label class="label">Expected Checkout Date & Time</label>
+                <input id="gCheckout" class="input" type="datetime-local" />
+              </div>
+
+              <div>
+                <label class="label">ID Proof Type (Optional)</label>
+                <select id="gIdType" class="input">
+                  <option value="">(Optional)</option>
+                  <option>CNIC</option>
+                  <option>Passport</option>
+                  <option>Driving License</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="label">ID Proof Number (Optional)</label>
+                <input id="gIdNo" class="input" placeholder="Optional" />
+              </div>
+
+              <div>
+                <label class="label">Advance Payment (PKR)</label>
+                <input id="gAdvance" class="input" type="number" placeholder="0" />
+              </div>
+              <div>
+                <label class="label">Payment Method</label>
+                <select id="gPayMethod" class="input">
+                  <option>Cash</option>
+                  <option>Card</option>
+                  <option>JazzCash</option>
+                  <option>EasyPaisa</option>
+                  <option>Bank Transfer</option>
+                  <option>UPI</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="checkinBtn" class="btn btn-primary">Complete Check-in</button>
+            <div id="guestMsg" class="small"></div>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div id="tab-history" class="tabpane">
+          <div class="card">
+            <div class="k">Guest History</div>
+            <div class="small">All guests who have ever stayed at HOTEL SUNSET</div>
+            <div id="guestHistoryList" class="list">
+              <div class="empty">No past guests yet. Guest history will appear here after first checkout.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section id="page-settings" class="page">
+        <h2 class="title">Settings</h2>
+        <p class="subtitle">Configure HOTEL SUNSET to match your needs</p>
+
+        <div class="card">
+          <div class="k">Tax Configuration</div>
+          <div class="small">Tax percentage can be updated at any time. New percentage applies to all new bills.</div>
+
+          <div class="grid2">
+            <div>
+              <label class="label">Enable Tax on Bills</label>
+              <select id="taxEnabled" class="input">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">Tax Name</label>
+              <input id="taxName" class="input" placeholder="GST" />
+            </div>
+            <div>
+              <label class="label">Tax Percentage (%)</label>
+              <input id="taxPct" class="input" type="number" placeholder="12" />
+            </div>
+          </div>
+
+          <button id="saveSettingsBtn" class="btn btn-primary">Save Tax Settings</button>
+          <div id="settingsMsg" class="small"></div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottomnav">
+      <button class="bnav active" data-page="dashboard">Home</button>
+      <button class="bnav" data-page="rooms">Rooms</button>
+      <button class="bnav" data-page="guests">Guests</button>
+      <button class="bnav" data-page="settings">More</button>
+    </nav>
+  </div>
+
+  <script src="./db.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
