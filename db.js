@@ -2,8 +2,8 @@
    HOTEL SUNSET — db.js
    CHANGE ONLY THESE 2 LINES:
 ================================================ */
-const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+const SUPABASE_URL = "https://oaukxhrautnqcrvkprup.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hdWt4aHJhdXRucWNydmtwcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTc1OTgsImV4cCI6MjA5MTc5MzU5OH0.3QnJbuhjlkLX3zykmf6kJcC_U_pv2RJeJNlveD5tAFE";
 /* ================================================
    DO NOT CHANGE ANYTHING BELOW THIS LINE
 ================================================ */
