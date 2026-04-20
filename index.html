@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>HOTEL SUNSET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<section id="authScreen" class="center-wrap">
+  <div class="auth-card card">
+    <h1 class="brand">HOTEL SUNSET</h1>
+    <p class="tagline">Manage Smarter. Stay Better.</p>
+    <div class="tabs">
+      <button class="tab active" id="tabLogin" type="button">Login</button>
+      <button class="tab" id="tabSignup" type="button">Sign Up</button>
+    </div>
+    <form id="loginForm" class="form">
+      <label class="label">Email Address</label>
+      <input id="loginEmail" class="input" type="email" 
+             placeholder="you@example.com" autocomplete="email" required/>
+      <label class="label">Password</label>
+      <input id="loginPassword" class="input" type="password" 
+             placeholder="Your password" autocomplete="current-password" required/>
+      <button id="loginBtn" class="btn btn-primary" type="submit">Login</button>
+      <button id="forgotBtn" class="btn btn-ghost" type="button">
+        Forgot Password
+      </button>
+      <p id="loginMsg" class="msg"></p>
+    </form>
+    <form id="signupForm" class="form hidden">
+      <label class="label">Email Address</label>
+      <input id="signupEmail" class="input" type="email" 
+             placeholder="you@example.com" autocomplete="email" required/>
+      <label class="label">Password</label>
+      <input id="signupPassword" class="input" type="password" 
+             placeholder="Create a password" autocomplete="new-password" required/>
+      <button id="signupBtn" class="btn btn-primary" type="submit">Sign Up</button>
+      <p id="signupMsg" class="msg"></p>
+    </form>
+    <p class="tiny">© 2025 HOTEL SUNSET. All rights reserved.</p>
+  </div>
+</section>
+
+<!-- APP SHELL -->
+<div id="appShell" class="app hidden">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button id="menuToggle" class="icon-btn" type="button">☰</button>
+      <div class="logo">HOTEL SUNSET</div>
+    </div>
+    <div class="topbar-right">
+      <button id="notifBtn" class="icon-btn notif-wrap" type="button">
+        🔔<span id="notifBadge" class="notif-badge hidden">0</span>
+      </button>
+      <button id="themeBtn" class="icon-btn" type="button">☀️</button>
+      <button id="logoutBtn" class="btn btn-danger-sm" type="button">
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- NOTIFICATIONS PANEL -->
+  <div id="notifPanel" class="notif-panel hidden">
+    <div class="notif-header">
+      <span class="k">Notifications</span>
+      <button id="markAllRead" class="btn-reset-sm" type="button">
+        Mark all read
+      </button>
+    </div>
+    <div id="notifList" class="notif-list">
+      <div class="empty">No notifications</div>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <button class="nav active" data-page="dashboard">🏠 Dashboard</button>
+    <button class="nav" data-page="rooms">🛏 Rooms</button>
+    <button class="nav" data-page="guests">👥 Guests</button>
+    <button class="nav" data-page="finance">💰 Finance</button>
+    <button class="nav" data-page="billing">🧾 Billing</button>
+    <button class="nav" data-page="maintenance">🔧 Maintenance</button>
+    <button class="nav" data-page="staff">👷 Staff & Salary</button>
+    <button class="nav" data-page="archive">📁 Archive</button>
+    <button class="nav" data-page="settings">⚙️ Settings</button>
+    <div class="sidebar-foot">© 2025 HOTEL SUNSET</div>
+  </aside>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="bnav active" data-page="dashboard">
+      <span>🏠</span><span>Home</span>
+    </button>
+    <button class="bnav" data-page="rooms">
+      <span>🛏</span><span>Rooms</span>
+    </button>
+    <button class="bnav" data-page="guests">
+      <span>👥</span><span>Guests</span>
+    </button>
+    <button class="bnav" data-page="finance">
+      <span>💰</span><span>Finance</span>
+    </button>
+    <button class="bnav" data-page="settings">
+      <span>⚙️</span><span>More</span>
+    </button>
+  </nav>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="page active">
+      <h2 class="title">Dashboard</h2>
+      <p class="subtitle">Live overview of HOTEL SUNSET</p>
+      <div class="grid4">
+        <div class="card stat-card green-card">
+          <div class="k">Available Rooms</div>
+          <div id="dAvail" class="v green">0</div>
+        </div>
+        <div class="card stat-card red-card">
+          <div class="k">Occupied Rooms</div>
+          <div id="dOcc" class="v red">0</div>
+        </div>
+        <div class="card stat-card amber-card">
+          <div class="k">Rooms Cleaning</div>
+          <div id="dClean" class="v amber">0</div>
+        </div>
+        <div class="card stat-card blue-card">
+          <div class="k">Under Maintenance</div>
+          <div id="dMaint" class="v blue">0</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="row-between">
+          <div>
+            <div class="k">Hotel Occupancy</div>
+            <div id="occText" class="small">No rooms configured yet</div>
+          </div>
+          <div id="occPct" class="big">0%</div>
+        </div>
+        <div class="meter">
+          <div id="occFill" class="meter-fill" style="width:0%"></div>
+        </div>
+        <div id="occLine" class="small">Occupied: 0 / Total: 0</div>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="card">
+          <div class="k">Today's Revenue</div>
+          <div id="dRevenue" class="v green">PKR 0</div>
+        </div>
+        <div class="card">
+          <div class="k">Today's Expenses</div>
+          <div id="dExpenses" class="v amber">PKR 0</div>
+        </div>
+        <div class="card">
+          <div class="k">Today's Profit / Loss</div>
+          <div id="dProfit" class="v green">PKR 0</div>
+        </div>
+        <div class="card">
+          <div class="k">Pending Payments</div>
+          <div id="dPending" class="v red">PKR 0</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="k">Profit & Loss Overview</div>
+        <p class="small">Reset clears dashboard display only — 
+        full history is always saved on Finance page.</p>
+        <div class="grid4" style="margin-top:10px">
+          <div class="card">
+            <div class="k">Daily P&L</div>
+            <div id="pnlDaily" class="v green">PKR 0</div>
+            <button class="btn-reset" onclick="resetPnl('daily')">
+              Reset
+            </button>
+          </div>
+          <div class="card">
+            <div class="k">Weekly P&L</div>
+            <div id="pnlWeekly" class="v green">PKR 0</div>
+            <button class="btn-reset" onclick="resetPnl('weekly')">
+              Reset
+            </button>
+          </div>
+          <div class="card">
+            <div class="k">Monthly P&L</div>
+            <div id="pnlMonthly" class="v green">PKR 0</div>
+            <button class="btn-reset" onclick="resetPnl('monthly')">
+              Reset
+            </button>
+          </div>
+          <div class="card">
+            <div class="k">Yearly P&L</div>
+            <div id="pnlYearly" class="v green">PKR 0</div>
+            <button class="btn-reset" onclick="resetPnl('yearly')">
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="k">Rooms Becoming Available Today</div>
+        <div class="small">Live countdown timers for today's checkouts</div>
+        <div id="availTodayList" class="list">
+          <div class="empty">No checkouts scheduled for today</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="k">Active Alerts</div>
+        <div id="alertsList" class="list">
+          <div class="item ok">
+            No active alerts — everything is on track!
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="k">Quick Notes</div>
+        <div class="small">Personal reminders for the owner</div>
+        <textarea id="quickNotes" class="textarea" 
+          placeholder="Write a quick note or reminder here...">
+        </textarea>
+        <button id="saveNoteBtn" class="btn btn-gold" 
+                style="margin-top:8px">Save Note</button>
+      </div>
+    </section>
+
+    <!-- ROOMS -->
+    <section id="page-rooms" class="page">
+      <h2 class="title">Rooms</h2>
+      <p class="subtitle">Manage all hotel rooms and their status</p>
+      <div class="card">
+        <div class="k">Add New Room</div>
+        <div class="grid2" style="margin-top:10px">
+          <div>
+            <label class="flabel">Room Number *</label>
+            <input id="rNumber" class="finput" placeholder="101"/>
+          </div>
+          <div>
+            <label class="flabel">Floor</label>
+            <input id="rFloor" class="finput" type="number" placeholder="1"/>
+          </div>
+          <div>
+            <label class="flabel">Room Type</label>
+            <input id="rType" class="finput" placeholder="Deluxe"/>
+          </div>
+          <div>
+            <label class="flabel">Rate Per Night (PKR)</label>
+            <input id="rRate" class="finput" type="number" placeholder="5000"/>
+          </div>
+          <div>
+            <label class="flabel">Status</label>
+            <select id="rStatus" class="finput">
+              <option>Available</option>
+              <option>Occupied</option>
+              <option>Cleaning</option>
+              <option>Maintenance</option>
+              <option>Blocked</option>
+            </select>
+          </div>
+          <div>
+            <label class="flabel">Room Notes</label>
+            <input id="rNotes" class="finput" placeholder="Optional notes"/>
+          </div>
+        </div>
+        <button id="addRoomBtn" class="btn btn-gold" style="margin-top:10px">
+          Save Room
+        </button>
+        <p id="roomMsg" class="msg-dark"></p>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="row-between">
+          <div class="k">All Rooms</div>
+          <input id="roomSearch" class="finput" 
+                 placeholder="Search rooms..." style="width:180px"/>
+        </div>
+        <div class="room-status-legend" style="margin-top:10px">
+          <span class="badge green">Available</span>
+          <span class="badge red">Occupied</span>
+          <span class="badge amber">Cleaning</span>
+          <span class="badge blue">Maintenance</span>
+          <span class="badge grey">Blocked</span>
+        </div>
+        <div id="roomsList" class="rooms-grid">
+          <div class="empty">No rooms added yet</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GUESTS -->
+    <section id="page-guests" class="page">
+      <h2 class="title">Guests</h2>
+      <div class="tabs" style="margin-bottom:12px">
+        <button class="tab active" data-tab="gcurrent">
+          Current Guests
+        </button>
+        <button class="tab" data-tab="gcheckin">
+          Check-in New Guest
+        </button>
+        <button class="tab" data-tab="ghistory">
+          Guest History
+        </button>
+      </div>
+
+      <!-- CURRENT GUESTS -->
+      <div id="tab-gcurrent" class="tabpane active">
+        <div class="card">
+          <div class="k">Current Guests</div>
+          <div class="small">
+            All guests currently staying at HOTEL SUNSET
+          </div>
+          <div id="currentGuestsList" class="list">
+            <div class="empty">
+              No guests currently staying. 
+              Check in a new guest to get started.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHECK IN -->
+      <div id="tab-gcheckin" class="tabpane">
+        <div class="card">
+          <div class="k">Check-in New Guest</div>
+          <div class="small">
+            Register a new guest and assign a room
+          </div>
+          <div id="returningGuestBanner" class="banner hidden"></div>
+          <div class="grid2" style="margin-top:10px">
+            <div>
+              <label class="flabel">Guest Name *</label>
+              <input id="gName" class="finput" placeholder="Full Name"/>
+            </div>
+            <div>
+              <label class="flabel">Phone Number *</label>
+              <input id="gPhone" class="finput" placeholder="+92..."/>
+            </div>
+            <div>
+              <label class="flabel">Email (Optional)</label>
+              <input id="gEmail" class="finput" 
+                     type="email" placeholder="Optional"/>
+            </div>
+            <div>
+              <label class="flabel">Select Room *</label>
+              <select id="gRoom" class="finput"></select>
+            </div>
+            <div>
+              <label class="flabel">Check-in Date & Time</label>
+              <input id="gCheckin" class="finput" type="datetime-local"/>
+            </div>
+            <div>
+              <label class="flabel">Expected Checkout Date & Time *</label>
+              <input id="gCheckout" class="finput" type="datetime-local"/>
+            </div>
+            <div>
+              <label class="flabel">Rate Per Night (PKR) *</label>
+              <input id="gRate" class="finput" 
+                     type="number" placeholder="5000"/>
+            </div>
+            <div>
+              <label class="flabel">Number of Adults</label>
+              <input id="gAdults" class="finput" 
+                     type="number" value="1" min="1"/>
+            </div>
+            <div>
+              <label class="flabel">Number of Children</label>
+              <input id="gChildren" class="finput" 
+                     type="number" value="0" min="0"/>
+            </div>
+            <div>
+              <label class="flabel">Advance Payment (PKR)</label>
+              <input id="gAdvance" class="finput" 
+                     type="number" value="0" min="0"/>
+            </div>
+            <div>
+              <label class="flabel">Payment Method</label>
+              <select id="gPayMethod" class="finput">
+                <option>Cash</option>
+                <option>Card</option>
+                <option>JazzCash</option>
+                <option>EasyPaisa</option>
+                <option>Bank Transfer</option>
+                <option>UPI</option>
+              </select>
+            </div>
+            <div>
+              <label class="flabel">Guest Tag (Optional)</label>
+              <select id="gType" class="finput">
+                <option value="">(Optional)</option>
+                <option>VIP</option>
+                <option>Regular</option>
+                <option>Corporate</option>
+                <option>Problem Guest</option>
+                <option>Business</option>
+                <option>Tourist</option>
+                <option>Family</option>
+              </select>
+            </div>
+            <div>
+              <label class="flabel">ID Proof Type (Optional)</label>
+              <select id="gIdType" class="finput">
+                <option value="">(Optional)</option>
+                <option>CNIC</option>
+                <option>Passport</option>
+                <option>Driving License</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="flabel">ID Proof Number (Optional)</label>
+              <input id="gIdNo" class="finput" placeholder="Optional"/>
+            </div>
+            <div>
+              <label class="flabel">Address (Optional)</label>
+              <input id="gAddress" class="finput" placeholder="Optional"/>
+            </div>
+          </div>
+          <button id="checkinBtn" class="btn btn-gold" 
+                  style="margin-top:10px">
+            Complete Check-in ✓
+          </button>
+          <p id="checkinMsg" class="msg-dark"></p>
+        </div>
+      </div>
+
+      <!-- GUEST HISTORY -->
+      <div id="tab-ghistory" class="tabpane">
+        <div class="card">
+          <div class="k">Guest History</div>
+          <div class="small">
+            All guests who have ever stayed at HOTEL SUNSET
+          </div>
+          <input id="gSearch" class="finput" 
+                 placeholder="Search by name or phone..." 
+                 style="margin:10px 0"/>
+          <div id="guestHistoryList" class="list">
+            <div class="empty">
+              No past guests yet. 
+              History will appear here after first checkout.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINANCE -->
+    <section id="page-finance" class="page">
+      <h2 class="title">Finance</h2>
+      <div class="tabs" style="margin-bottom:12px">
+        <button class="tab active" data-tab="frevenue">Revenue</button>
+        <button class="tab" data-tab="fexpenses">Expenses</button>
+        <button class="tab" data-tab="fpnl">Profit & Loss</button>
+      </div>
+
+      <!-- REVENUE TAB -->
+      <div id="tab-frevenue" class="tabpane active">
+        <div class="grid2">
+          <div class="card">
+            <div class="k">Today's Revenue</div>
+            <div id="fTodayRev" class="v green">PKR 0</div>
+          </div>
+          <div class="card">
+            <div class="k">This Month's Revenue</div>
+            <div id="fMonthRev" class="v green">PKR 0</div>
+          </div>
+          <div class="card">
+            <div class="k">This Year's Revenue</div>
+            <div id="fYearRev" class="v green">PKR 0</div>
+          </div>
+          <div class="card">
+            <div class="k">All-Time Revenue</div>
+            <div id="fAllRev" class="v green">PKR 0</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="k">Add Revenue Entry</div>
+          <div class="grid2" style="margin-top:10px">
+            <div>
+              <label class="flabel">Date</label>
+              <input id="revDate" class="finput" type="date"/>
+            </div>
+            <div>
+              <label class="flabel">Amount (PKR)</label>
+              <input id="revAmount" class="finput" 
+                     type="number" placeholder="0"/>
+            </div>
+            <div>
+              <label class="flabel">Category</label>
+              <select id="revCategory" class="finput">
+                <option>Room Revenue</option>
+                <option>Extra Services</option>
+                <option>Damage Charges</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="flabel">Description</label>
+              <input id="revDesc" class="finput" placeholder="Optional"/>
+            </div>
+            <div>
+              <label class="flabel">Payment Method</label>
+              <select id="revMethod" class="finput">
+                <option>Cash</option>
+                <option>Card</option>
+                <option>JazzCash</option>
+                <option>EasyPaisa</option>
+                <option>Bank Transfer</option>
+                <option>UPI</option>
+              </select>
+            </div>
+          </div>
+          <button id="addRevBtn" class="btn btn-gold" 
+                  style="margin-top:10px">
+            Add Revenue
+          </button>
+          <p id="revMsg" class="msg-dark"></p>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="k">Revenue Records</div>
+          <div id="rev
