@@ -1,59 +1,45 @@
 body {
   font-family: Arial;
   padding: 20px;
+  background: #f5f5f5;
 }
 
-.hidden {
-  display: none;
+h2, h3 {
+  color: #333;
 }
 
-input {
+input, select {
   display: block;
-  margin: 10px 0;
+  margin: 8px 0;
   padding: 8px;
+  width: 200px;
 }
 
 button {
-  padding: 10px;
-  cursor: pointer;
-}
-
-#rooms div {
-  border: 1px solid #ccc;
+  padding: 8px 12px;
   margin: 5px 0;
-  padding: 8px;
-}
-// GUESTS
-async function addGuest(payload) {
-  const user = await getUser()
-  return await db.from('guests').insert({
-    ...payload,
-    owner_id: user.id
-  }).select().single()
+  cursor: pointer;
+  background: #222;
+  color: white;
+  border: none;
 }
 
-// STAYS
-async function addStay(payload) {
-  const user = await getUser()
-  return await db.from('stays').insert({
-    ...payload,
-    owner_id: user.id
-  })
+button:hover {
+  background: #444;
 }
 
-async function getCurrentStays() {
-  const user = await getUser()
-  const { data } = await db
-    .from('stays')
-    .select('*')
-    .eq('owner_id', user.id)
-    .is('checkout_at', null)
-
-  return data || []
+#rooms div,
+#guests div {
+  background: white;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ddd;
 }
 
-async function updateRoomStatus(id, status) {
-  return await db.from('rooms')
-    .update({ status })
-    .eq('id', id)
-  }
+.stat {
+  background: white;
+  padding: 10px;
+  margin: 5px;
+  display: inline-block;
+  min-width: 120px;
+}
