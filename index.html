@@ -15,3 +15,39 @@
   <button onclick="handleLogin()">Login</button>
   <p id="msg"></p>
 </div>      
+<link rel="stylesheet" href="styles.css">
+
+<div id="app" style="display:none">
+
+  <h2>Dashboard</h2>
+  <button onclick="handleLogout()">Logout</button>
+
+  <div>
+    <div class="stat">Rooms: <span id="statRooms">0</span></div>
+    <div class="stat">Guests: <span id="statGuests">0</span></div>
+    <div class="stat">Revenue: PKR <span id="statRevenue">0</span></div>
+  </div>
+
+  <hr>
+
+  <h3>Add Room</h3>
+  <input id="roomNo" placeholder="Room">
+  <input id="roomRate" placeholder="Rate">
+  <button onclick="addRoomUI()">Add</button>
+
+  <h3>Rooms</h3>
+  <div id="rooms"></div>
+
+  <hr>
+
+  <h3>Check-in</h3>
+  <input id="gName" placeholder="Name">
+  <input id="gPhone" placeholder="Phone">
+  <select id="gRoom"></select>
+  <input id="gDays" placeholder="Days stay">
+  <button onclick="checkin()">Check-in</button>
+
+  <h3>Active Guests</h3>
+  <div id="guests"></div>
+
+</div>
