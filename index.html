@@ -1,57 +1,47 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8">
   <title>HOTEL SUNSET</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="styles.css">
-
-  <!-- ✅ Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div id="auth">
-  <h1>HOTEL SUNSET</h1>
-
+  <h2>Login</h2>
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
-
-  <button id="loginBtn">Login</button>
-
+  <button onclick="handleLogin()">Login</button>
   <p id="msg"></p>
 </div>
 
-<!-- APP -->
-<div id="app" class="hidden">
+<div id="app" style="display:none">
 
   <h2>Dashboard</h2>
-  <button id="logoutBtn">Logout</button>
+  <button onclick="handleLogout()">Logout</button>
 
-  <hr>
-
-  <!-- ROOMS -->
   <h3>Add Room</h3>
-  <input id="roomNumber" placeholder="Room Number">
+  <input id="roomNo" placeholder="Room">
   <input id="roomRate" placeholder="Rate">
-  <button id="addRoom">Add Room</button>
+  <button onclick="addRoomUI()">Add</button>
 
   <h3>Rooms</h3>
   <div id="rooms"></div>
 
-  <hr>
-
-  <!-- GUEST CHECK-IN -->
-  <h3>Check-in Guest</h3>
-  <input id="gName" placeholder="Guest Name">
+  <h3>Check-in</h3>
+  <input id="gName" placeholder="Name">
   <input id="gPhone" placeholder="Phone">
   <select id="gRoom"></select>
+  <button onclick="checkin()">Check-in</button>
 
-  <button id="checkin">Check-in</button>
-
-  <h3>Current Guests</h3>
+  <h3>Active Guests</h3>
   <div id="guests"></div>
 
 </div>
+
+<script src="db.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
