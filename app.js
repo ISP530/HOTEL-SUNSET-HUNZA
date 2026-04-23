@@ -77,20 +77,52 @@ async function checkin() {
   const name = document.getElementById("gName").value
   const phone = document.getElementById("gPhone").value
   const room = document.getElementById("gRoom").value
+  const days = Number(document.getElementById("gDays").value || 1)
+
+  const rooms = await getRooms()
+  const selectedRoom = rooms.find(r => r.id === room)
 
   const { data: guest } = await addGuest({ name, phone })
+
+  const total = days * (selectedRoom.rate_per_night || 0)
 
   await addStay({
     guest_id: guest.id,
     room_id: room,
     guest_name: name,
-    expected_checkout_at: new Date(Date.now() + 86400000)
+    rate_per_night: selectedRoom.rate_per_night,
+    expected_checkout_at: new Date(Date.now() + days * 86400000),
+    total_amount: total
   })
 
   await updateRoom(room, "Occupied")
 
   loadGuests()
   loadRooms()
+  loadDashboard()
+}
+
+// Checkout 
+async function checkout(id) {
+  const stays = await getActiveStays()
+  const stay = stays.find(s => s.id === id)
+
+  const now = new Date()
+  const checkout = new Date(stay.expected_checkout_at)
+
+  const days = Math.ceil((checkout - new Date(stay.created_at)) / 86400000)
+  const total = days * stay.rate_per_night
+
+  await addRevenue(total)
+
+  await checkoutStay(id)
+  await updateRoom(stay.room_id, "Available")
+
+  alert("Bill: PKR " + total)
+
+  loadGuests()
+  loadRooms()
+  loadDashboard()
 }
 
 // GUESTS
@@ -101,18 +133,17 @@ async function loadGuests() {
   el.innerHTML = ""
 
   stays.forEach(s => {
+    const remaining = Math.max(0,
+      Math.floor((new Date(s.expected_checkout_at) - new Date()) / 3600000)
+    )
+
     el.innerHTML += `
       <div>
-        ${s.guest_name}
+        ${s.guest_name} | ${remaining}h left
         <button onclick="checkout('${s.id}')">Checkout</button>
       </div>
     `
   })
-}
-
-async function checkout(id) {
-  await checkoutStay(id)
-  loadGuests()
 }
 
 // AUTO LOGIN
@@ -120,3 +151,14 @@ window.onload = async () => {
   const user = await getUser()
   if (user) startApp()
     }
+
+// DASHBOARD
+async function loadDashboard() {
+  const rooms = await getRooms()
+  const guests = await getActiveStays()
+  const revenue = await getRevenueTotal()
+
+  document.getElementById("statRooms").innerText = rooms.length
+  document.getElementById("statGuests").innerText = guests.length
+  document.getElementById("statRevenue").innerText = revenue
+                                   }
