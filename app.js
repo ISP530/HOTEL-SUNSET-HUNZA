@@ -1,134 +1,118 @@
-// LOGIN
-document.getElementById('loginBtn').onclick = async () => {
-  const email = document.getElementById('email').value
-  const password = document.getElementById('password').value
+async function handleLogin() {
+  const email = document.getElementById("email").value
+  const password = document.getElementById("password").value
 
   const { error } = await login(email, password)
 
   if (error) {
-    document.getElementById('msg').innerText = error.message
+    document.getElementById("msg").innerText = error.message
   } else {
     startApp()
   }
 }
 
-// LOGOUT
-document.getElementById('logoutBtn').onclick = async () => {
+async function handleLogout() {
   await logout()
   location.reload()
 }
 
-// START APP
 async function startApp() {
-  document.getElementById('auth').classList.add('hidden')
-  document.getElementById('app').classList.remove('hidden')
+  document.getElementById("auth").style.display = "none"
+  document.getElementById("app").style.display = "block"
 
   loadRooms()
   loadGuests()
   loadRoomDropdown()
 }
 
-// ADD ROOM
-document.getElementById('addRoom').onclick = async () => {
-  const number = document.getElementById('roomNumber').value
-  const rate = document.getElementById('roomRate').value
-
-  if (!number) return alert('Enter room number')
+// ROOMS UI
+async function addRoomUI() {
+  const no = document.getElementById("roomNo").value
+  const rate = document.getElementById("roomRate").value
 
   await addRoom({
-    room_number: number,
-    rate_per_night: Number(rate) || 0,
-    status: 'Available'
+    room_number: no,
+    rate_per_night: rate,
+    status: "Available"
   })
 
   loadRooms()
-  loadRoomDropdown()
 }
 
-// LOAD ROOMS
 async function loadRooms() {
   const rooms = await getRooms()
-  const container = document.getElementById('rooms')
-
-  container.innerHTML = ''
+  const el = document.getElementById("rooms")
+  el.innerHTML = ""
 
   rooms.forEach(r => {
-    const div = document.createElement('div')
-    div.innerHTML = `
-      Room ${r.room_number} - ${r.status}
-      <button onclick="deleteRoom('${r.id}')">Delete</button>
-      <button onclick="toggleRoom('${r.id}','${r.status}')">Change Status</button>
+    el.innerHTML += `
+      <div>
+        Room ${r.room_number} (${r.status})
+        <button onclick="deleteRoom('${r.id}')">X</button>
+        <button onclick="toggle('${r.id}','${r.status}')">Toggle</button>
+      </div>
     `
-    container.appendChild(div)
   })
 }
 
-// DELETE ROOM
-async function deleteRoom(id) {
-  await db.from('rooms').delete().eq('id', id)
+async function toggle(id, status) {
+  const newStatus = status === "Available" ? "Blocked" : "Available"
+  await updateRoom(id, newStatus)
   loadRooms()
 }
 
-// CHANGE STATUS
-async function toggleRoom(id, status) {
-  const newStatus = status === 'Available' ? 'Blocked' : 'Available'
-  await updateRoomStatus(id, newStatus)
-  loadRooms()
-}
-
-// ROOM DROPDOWN
+// DROPDOWN
 async function loadRoomDropdown() {
   const rooms = await getRooms()
-  const select = document.getElementById('gRoom')
+  const el = document.getElementById("gRoom")
 
-  select.innerHTML = rooms
-    .filter(r => r.status === 'Available')
+  el.innerHTML = rooms
+    .filter(r => r.status === "Available")
     .map(r => `<option value="${r.id}">${r.room_number}</option>`)
-    .join('')
+    .join("")
 }
 
-// CHECK-IN
-document.getElementById('checkin').onclick = async () => {
-  const name = document.getElementById('gName').value
-  const phone = document.getElementById('gPhone').value
-  const roomId = document.getElementById('gRoom').value
+// CHECKIN
+async function checkin() {
+  const name = document.getElementById("gName").value
+  const phone = document.getElementById("gPhone").value
+  const room = document.getElementById("gRoom").value
 
-  if (!name || !phone || !roomId) {
-    return alert('Fill all fields')
-  }
-
-  const { data: guest } = await addGuest({
-    name,
-    phone
-  })
+  const { data: guest } = await addGuest({ name, phone })
 
   await addStay({
     guest_id: guest.id,
-    room_id: roomId,
+    room_id: room,
     guest_name: name,
-    room_number: '',
     expected_checkout_at: new Date(Date.now() + 86400000)
   })
 
-  await updateRoomStatus(roomId, 'Occupied')
+  await updateRoom(room, "Occupied")
 
   loadGuests()
   loadRooms()
-  loadRoomDropdown()
 }
 
-// LOAD GUESTS
+// GUESTS
 async function loadGuests() {
-  const stays = await getCurrentStays()
-  const container = document.getElementById('guests')
+  const stays = await getActiveStays()
+  const el = document.getElementById("guests")
 
-  container.innerHTML = ''
+  el.innerHTML = ""
 
   stays.forEach(s => {
-    const div = document.createElement('div')
-    div.innerText = `${s.guest_name} (Room ID: ${s.room_id})`
-    container.appendChild(div)
+    el.innerHTML += `
+      <div>
+        ${s.guest_name}
+        <button onclick="checkout('${s.id}')">Checkout</button>
+      </div>
+    `
   })
+}
+
+async function checkout(id) {
+  await checkoutStay(id)
+  loadGuests()
 }
 
 // AUTO LOGIN
