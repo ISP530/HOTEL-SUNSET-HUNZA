@@ -1,6 +1,5 @@
-
-const SUPABASE_URL = 'https://oaukxhrautnqcrvkprup.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hdWt4aHJhdXRucWNydmtwcnVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTc1OTgsImV4cCI6MjA5MTc5MzU5OH0.3QnJbuhjlkLX3zykmf6kJcC_U_pv2RJeJNlveD5tAFE'
+const SUPABASE_URL = "https://oaukxhrautnqcrvkprup.supabase.co"
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
@@ -19,54 +18,62 @@ async function getUser() {
 }
 
 // ROOMS
-async function addRoom(room) {
+async function getRooms() {
   const user = await getUser()
-  return await db.from('rooms').insert({
-    ...room,
+  const { data } = await db.from("rooms")
+    .select("*")
+    .eq("owner_id", user.id)
+  return data || []
+}
+
+async function addRoom(data) {
+  const user = await getUser()
+  return await db.from("rooms").insert({
+    ...data,
     owner_id: user.id
   })
 }
 
-async function getRooms() {
-  const user = await getUser()
-  const { data } = await db
-    .from('rooms')
-    .select('*')
-    .eq('owner_id', user.id)
-
-  return data || []
+async function updateRoom(id, status) {
+  return await db.from("rooms")
+    .update({ status })
+    .eq("id", id)
 }
-// GUESTS
-async function addGuest(payload) {
+
+async function deleteRoom(id) {
+  return await db.from("rooms").delete().eq("id", id)
+}
+
+// GUEST
+async function addGuest(data) {
   const user = await getUser()
-  return await db.from('guests').insert({
-    ...payload,
+  return await db.from("guests").insert({
+    ...data,
     owner_id: user.id
   }).select().single()
 }
 
-// STAYS
-async function addStay(payload) {
+// STAY
+async function addStay(data) {
   const user = await getUser()
-  return await db.from('stays').insert({
-    ...payload,
+  return await db.from("stays").insert({
+    ...data,
     owner_id: user.id
   })
 }
 
-async function getCurrentStays() {
+async function getActiveStays() {
   const user = await getUser()
-  const { data } = await db
-    .from('stays')
-    .select('*')
-    .eq('owner_id', user.id)
-    .is('checkout_at', null)
-
+  const { data } = await db.from("stays")
+    .select("*")
+    .eq("owner_id", user.id)
+    .is("checkout_at", null)
   return data || []
 }
 
-async function updateRoomStatus(id, status) {
-  return await db.from('rooms')
-    .update({ status })
-    .eq('id', id)
-  }
+async function checkoutStay(id) {
+  return await db.from("stays")
+    .update({ checkout_at: new Date() })
+    .eq("id", id)
+    }
+
