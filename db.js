@@ -76,4 +76,20 @@ async function checkoutStay(id) {
     .update({ checkout_at: new Date() })
     .eq("id", id)
     }
+async function addRevenue(amount) {
+  const user = await getUser()
+  return await db.from("revenue").insert({
+    owner_id: user.id,
+    amount
+  })
+}
 
+async function getRevenueTotal() {
+  const user = await getUser()
+  const { data } = await db
+    .from("revenue")
+    .select("amount")
+    .eq("owner_id", user.id)
+
+  return (data || []).reduce((s, r) => s + Number(r.amount), 0)
+}
