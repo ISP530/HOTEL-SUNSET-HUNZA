@@ -28,25 +28,30 @@
 <div id="app" class="hidden">
 
   <h2>Dashboard</h2>
-
   <button id="logoutBtn">Logout</button>
 
   <hr>
 
+  <!-- ROOMS -->
   <h3>Add Room</h3>
-
   <input id="roomNumber" placeholder="Room Number">
   <input id="roomRate" placeholder="Rate">
-
   <button id="addRoom">Add Room</button>
 
   <h3>Rooms</h3>
   <div id="rooms"></div>
 
+  <hr>
+
+  <!-- GUEST CHECK-IN -->
+  <h3>Check-in Guest</h3>
+  <input id="gName" placeholder="Guest Name">
+  <input id="gPhone" placeholder="Phone">
+  <select id="gRoom"></select>
+
+  <button id="checkin">Check-in</button>
+
+  <h3>Current Guests</h3>
+  <div id="guests"></div>
+
 </div>
-
-<script src="db.js"></script>
-<script src="app.js"></script>
-
-</body>
-    </html>
